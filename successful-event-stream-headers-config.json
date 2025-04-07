@@ -1,0 +1,21 @@
+{
+  "url": "https://collect.tealiumiq.com/event",
+  "headers": {
+    "X-Tealium-Account": "sales-eva-rodenas",
+    "X-Tealium-Profile": "vueling-demo",
+    "X-Tealium-Key": "qx0pe2"
+  },
+  "payload_example": {
+    "tealium_account": "my-account",
+    "tealium_profile": "my-profile",
+    "tealium_visitor_id": "test-visitor-1743431758798",
+    "email": "my-email",
+    "event_name": "test_event",
+    "page_name": "home",
+    "page_type": "homepage",
+    "test_property": "event_collection_test",
+    "source": "Tealium API Test Script",
+    "timestamp_epoch": 1743431758
+  },
+  "time": "2025-03-31T14:35:59.264Z"
+}
