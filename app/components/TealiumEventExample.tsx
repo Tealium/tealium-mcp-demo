@@ -2,10 +2,10 @@
 
 import { useState } from 'react';
 import { sendTealiumEvent, trackPageView, trackUserAction, trackFormSubmission } from '../services/tealium-service';
-import { SAMPLE_DATA } from '@/lib/config';
+import { properties } from '@/lib/config';
 
 export default function TealiumEventExample() {
-  const [email, setEmail] = useState<string>(SAMPLE_DATA.email || 'visitor@example.com');
+  const [email, setEmail] = useState<string>(properties.email);
   const [eventName, setEventName] = useState<string>('custom_event');
   const [eventData, setEventData] = useState<string>('{\n  "product_name": "Example Product",\n  "price": 99.99,\n  "currency": "EUR"\n}');
   const [result, setResult] = useState<string>('');

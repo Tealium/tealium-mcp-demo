@@ -143,13 +143,9 @@ export default function InstructionsPage() {
                       <td className="py-2 font-medium">TEALIUM_PROFILE</td>
                       <td className="py-2">Your Tealium profile name (e.g., 'main')</td>
                     </tr>
-                    <tr className="border-b">
+                    <tr>
                       <td className="py-2 font-medium">TEALIUM_ENGINE_ID</td>
                       <td className="py-2">Your personalization engine ID (UUID format)</td>
-                    </tr>
-                    <tr>
-                      <td className="py-2 font-medium">TEALIUM_MOMENTS_API_KEY</td>
-                      <td className="py-2">Your Tealium API key with Moments API access</td>
                     </tr>
                   </tbody>
                 </table>
@@ -273,8 +269,7 @@ export default function InstructionsPage() {
                   <pre className="bg-gray-800 text-white p-3 rounded text-sm mt-2 overflow-x-auto">
 {`TEALIUM_ACCOUNT=your-account
 TEALIUM_PROFILE=your-profile
-TEALIUM_ENGINE_ID=your-engine-id
-TEALIUM_MOMENTS_API_KEY=your-api-key`}
+TEALIUM_ENGINE_ID=your-engine-id`}
                   </pre>
                 </li>
                 

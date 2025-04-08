@@ -118,13 +118,16 @@ The application follows a 7-step workflow for Tealium-integrated chatbots:
 
 ## Configuration
 
-The Tealium configuration page requires:
+The Tealium configuration is centralized in the `properties` object in `lib/config.ts` and requires:
 
-- **Account ID**: Your Tealium account ID
-- **Profile**: The profile name in your Tealium account
-- **Data Source Key**: Your EventStream data source key
-- **Engine ID**: (For Moments API) The engine ID for your Tealium instance
-- **API Key**: (Optional) API key if your Tealium APIs require authentication
+- **account**: Your Tealium account ID
+- **profile**: The profile name in your Tealium account
+- **dataSourceKey**: Your EventStream data source key
+- **engineId**: (For Moments API) The engine ID for your Tealium instance
+- **visitorApi**: Base URL for the Visitor API
+- **sample data**: Sample values for testing (email, name, location, etc.)
+
+This centralized configuration approach ensures that no personal or account information is hardcoded in the application code.
 
 ## Key Components
 

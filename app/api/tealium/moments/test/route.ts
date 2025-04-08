@@ -17,7 +17,6 @@ export async function GET(request: NextRequest) {
     const visitorId = searchParams.get('visitorId');
     
     // Optional params
-    const apiKey = searchParams.get('apiKey') || undefined;
     const debug = searchParams.get('debug') === 'true';
     
     // Check required parameters
@@ -34,7 +33,6 @@ export async function GET(request: NextRequest) {
       profile,
       engineId,
       visitorId,
-      hasApiKey: !!apiKey,
       debug
     });
     
@@ -46,7 +44,6 @@ export async function GET(request: NextRequest) {
         account,
         profile,
         engineId,
-        apiKey,
         debug
       });
       

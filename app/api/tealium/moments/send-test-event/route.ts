@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { properties } from '@/lib/config';
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,10 +38,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get environment variables
-    const account = process.env.TEALIUM_ACCOUNT || '';
-    const profile = process.env.TEALIUM_PROFILE || '';
-    const dataSourceKey = process.env.TEALIUM_DATASOURCE_KEY || '';
+    // Get account configuration from centralized properties
+    const account = properties.account;
+    const profile = properties.profile;
+    const dataSourceKey = properties.dataSourceKey;
     
     // Create a visitor ID if none was provided (based on email)
     const visitorId = customVisitorId || `email-${email.replace(/[^a-zA-Z0-9]/g, '-')}-${Date.now()}`;
@@ -57,7 +58,7 @@ export async function POST(request: NextRequest) {
     };
 
     // Define event collection endpoint - UPDATED TO USE WORKING API PATTERN
-    const eventEndpoint = `https://collect.tealiumiq.com/event`;
+    const eventEndpoint = properties.collectApi;
     
     console.log(`Sending test event to: ${eventEndpoint}`);
     console.log('Payload:', JSON.stringify(payload, null, 2));

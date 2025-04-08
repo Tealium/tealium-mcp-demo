@@ -1,29 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { properties } from '@/lib/config';
 
 export async function GET(request: NextRequest) {
   try {
-    // Get environment variables
-    const account = process.env.TEALIUM_ACCOUNT || '';
-    const profile = process.env.TEALIUM_PROFILE || '';
-    const engineId = process.env.TEALIUM_ENGINE_ID || '';
-    const apiKey = process.env.TEALIUM_MOMENTS_API_KEY || '';
-    const datasourceKey = process.env.TEALIUM_DATASOURCE_KEY || '';
+    const { searchParams } = new URL(request.url);
+    
+    // Get configuration from centralized properties
+    const account = properties.account;
+    const profile = properties.profile;
+    const engineId = properties.engineId;
+    const datasourceKey = properties.dataSourceKey;
 
-    // Return masked env var info
+    // Return environment variable information for debugging
     return NextResponse.json({
-      env_vars_configured: {
-        TEALIUM_ACCOUNT: account ? `${account}` : 'Not configured',
-        TEALIUM_PROFILE: profile ? `${profile}` : 'Not configured',
-        TEALIUM_ENGINE_ID: engineId ? `${engineId.substring(0, 5)}...${engineId.substring(engineId.length - 5)}` : 'Not configured',
-        TEALIUM_MOMENTS_API_KEY: apiKey ? `${apiKey.substring(0, 3)}...${apiKey.substring(apiKey.length - 3)} (${apiKey.length} chars)` : 'Not configured',
+      success: true,
+      environment: {
+        TEALIUM_ACCOUNT: account || 'Not configured',
+        TEALIUM_PROFILE: profile || 'Not configured',
+        TEALIUM_ENGINE_ID: engineId || 'Not configured',
         TEALIUM_DATASOURCE_KEY: datasourceKey ? `${datasourceKey.substring(0, 3)}...${datasourceKey.substring(datasourceKey.length - 3)} (${datasourceKey.length} chars)` : 'Not configured',
+        // Note: Moments API doesn't require an API key
       },
-      expected_values: {},
-      check_passed: {
-        account: account !== '',
-        profile: profile !== '',
-        engineId: !!engineId,
-        apiKey: apiKey.length > 10,
+      checks: {
+        account: account.length > 0,
+        profile: profile.length > 0,
+        engineId: engineId.length > 0,
         datasourceKey: datasourceKey.length > 0 || true // Optional
       }
     }, { status: 200 });

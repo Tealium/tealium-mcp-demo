@@ -1,7 +1,8 @@
 import Logger from '@/lib/debug-logger';
+import { TEALIUM_MOMENTS_API_BASE_URL } from '@/lib/config';
 
 // Use the correct API endpoint for Tealium Moments
-const MOMENTS_API_BASE_URL = 'https://personalization-api.eu-central-1.prod.tealiumapis.com/personalization/accounts/';
+const MOMENTS_API_BASE_URL = TEALIUM_MOMENTS_API_BASE_URL;
 
 // Export the interface so it can be used in other files
 export interface VisitorParams {
@@ -15,7 +16,7 @@ export interface MomentsConfig {
   profile: string;
   engineId: string; // Required for this endpoint format
   debug?: boolean;
-  apiKey?: string; // Optional API key
+  // Note: Moments API currently doesn't require an API key
   useCache?: boolean; // Optional cache flag
 }
 
@@ -29,7 +30,7 @@ export interface MomentsConfig {
  */
 export async function getVisitorData(params: VisitorParams, config: MomentsConfig): Promise<any> {
   try {
-    const { account, profile, engineId, debug, apiKey } = config;
+    const { account, profile, engineId, debug } = config;
     const { visitorId, attributeId, attributeValue } = params;
     
     if (!account || !profile || !engineId) {
@@ -39,7 +40,7 @@ export async function getVisitorData(params: VisitorParams, config: MomentsConfi
     if (debug) {
       Logger.debug('Moments API request:', { 
         params, 
-        config: { ...config, apiKey: apiKey ? '***' : undefined } 
+        config 
       });
     }
     
@@ -70,13 +71,7 @@ export async function getVisitorData(params: VisitorParams, config: MomentsConfi
       'Accept': 'application/json',
     };
     
-    // Add the API key if provided
-    if (apiKey) {
-      headers['Authorization'] = `Bearer ${apiKey}`;
-      if (debug) {
-        Logger.debug('Using API key for Moments API request');
-      }
-    }
+    // Note: The Moments API currently doesn't require an API key
     
     // Try to get data from cache first (if using cache is enabled)
     try {

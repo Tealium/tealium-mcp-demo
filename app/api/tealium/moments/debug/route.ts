@@ -17,9 +17,6 @@ export async function GET(request: NextRequest) {
     const engineId = searchParams.get('engineId') || '';
     const identifier = searchParams.get('identifier'); // Email or other ID
     
-    // Optional params
-    const apiKey = searchParams.get('apiKey') || undefined;
-    
     // Check required parameters
     if (!account || !profile || !engineId || !identifier) {
       return NextResponse.json({
@@ -46,7 +43,6 @@ export async function GET(request: NextRequest) {
         account,
         profile,
         engineId,
-        apiKey,
         debug: true
       });
       
@@ -91,7 +87,6 @@ export async function GET(request: NextRequest) {
             account,
             profile,
             engineId,
-            apiKey,
             debug: true
           });
           
@@ -130,7 +125,6 @@ export async function GET(request: NextRequest) {
           account,
           profile,
           engineId,
-          apiKey,
           debug: true
         });
         

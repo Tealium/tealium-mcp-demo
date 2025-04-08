@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { TEALIUM_ACCOUNT, TEALIUM_PROFILE, TEALIUM_ENGINE_ID, SAMPLE_DATA } from '@/lib/config';
+import { properties } from '@/lib/config';
 
 export async function GET(request: NextRequest) {
   try {
-    // Get account configuration from centralized config
-    const account = TEALIUM_ACCOUNT;
-    const profile = TEALIUM_PROFILE;
-    const engineId = TEALIUM_ENGINE_ID;
+    // Get account configuration from centralized properties
+    const account = properties.account;
+    const profile = properties.profile;
+    const engineId = properties.engineId;
     
     // Get email and visitorId from query params
     const { searchParams } = new URL(request.url);
-    const email = searchParams.get('email') || SAMPLE_DATA.email;
+    const email = searchParams.get('email') || properties.email;
     const visitorId = searchParams.get('visitorId');
     
     // Extract Referer and Origin from headers or use defaults

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { TEALIUM_ACCOUNT, TEALIUM_PROFILE, TEALIUM_VISITOR_API, SAMPLE_DATA } from '@/lib/config';
+import { properties } from '@/lib/config';
 
 /**
  * Tealium Moments API Base Route
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Construct the visitor API endpoint
-    const visitorEndpoint = `${TEALIUM_VISITOR_API}/visitors/lookup`;
+    const visitorEndpoint = `${properties.visitorApi}/visitors/lookup`;
     console.log(`[Moments API] Calling visitor lookup endpoint: ${visitorEndpoint}`);
     
     // Prepare request payload
@@ -55,8 +55,8 @@ export async function GET(request: NextRequest) {
       { 
         success: response.ok, 
         data,
-        account: TEALIUM_ACCOUNT,
-        profile: TEALIUM_PROFILE
+        account: properties.account,
+        profile: properties.profile
       },
       { status: response.ok ? 200 : 500 }
     );
@@ -98,16 +98,16 @@ export async function POST(request: NextRequest) {
         audiences: ["New User", "Mobile User"],
         badges: ["Loyalty Member", "Frequent Shopper"],
         properties: {
-          "name": SAMPLE_DATA.name,
-          "location": SAMPLE_DATA.city
+          "name": properties.name,
+          "location": properties.city
         },
         metrics: {
           "lifetime_value": 250.75,
           "visit_count": 12
         }
       },
-      account: TEALIUM_ACCOUNT,
-      profile: TEALIUM_PROFILE
+      account: properties.account,
+      profile: properties.profile
     };
     
     return NextResponse.json(

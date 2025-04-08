@@ -1,14 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Logger from '../../../../../lib/debug-logger';
+import { findVisitorByEmail } from '@/app/lib/moments-service';
+import { properties } from '@/lib/config';
 
-// Get environment variables (will be loaded server-side only)
-const API_KEY = process.env.TEALIUM_MOMENTS_API_KEY || '';
-const TEALIUM_ACCOUNT = process.env.TEALIUM_ACCOUNT || '';
-const TEALIUM_PROFILE = process.env.TEALIUM_PROFILE || '';
-const ENGINE_ID = process.env.TEALIUM_ENGINE_ID || '';
+// Note: Moments API doesn't require an API key
+
+// Get account configuration from centralized properties
+const TEALIUM_ACCOUNT = properties.account;
+const TEALIUM_PROFILE = properties.profile;
+const ENGINE_ID = properties.engineId;
 
 // API base URL
-const MOMENTS_API_BASE_URL = 'https://personalization-api.eu-central-1.prod.tealiumapis.com/personalization/accounts/';
+const MOMENTS_API_BASE_URL = properties.momentsApiBaseUrl;
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,20 +30,13 @@ export async function POST(request: NextRequest) {
     const maskedEmail = `${emailParts[0].substring(0, 2)}***@${emailParts[1]}`;
     Logger.debug(`Looking up visitor by email: ${maskedEmail}`);
 
-    // Set up headers with auth and referrer information
+    // Set up headers with referrer information
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
       'Referer': 'https://tealium-mcp-ingestion-app.vercel.app',
       'Origin': 'https://tealium-mcp-ingestion-app.vercel.app'
     };
-    
-    // Only add Authorization if we have an API key
-    if (API_KEY) {
-      headers['Authorization'] = `Bearer ${API_KEY}`;
-    } else {
-      Logger.warning('No Tealium API key provided - attempting request without authentication');
-    }
 
     // Array of URL patterns to try - different endpoints and formats
     const urlPatterns = [

@@ -1,4 +1,4 @@
-import { TEALIUM_ACCOUNT, TEALIUM_PROFILE, TEALIUM_VISITOR_API, SAMPLE_DATA } from './config';
+import { properties } from './config';
 
 /**
  * Configuration options for the Moments API
@@ -35,9 +35,9 @@ export interface VisitorProfile {
  * Default configuration for the Moments API
  */
 const defaultConfig: MomentsApiConfig = {
-  account: TEALIUM_ACCOUNT,
-  profile: TEALIUM_PROFILE,
-  visitorApi: TEALIUM_VISITOR_API,
+  account: properties.account,
+  profile: properties.profile,
+  visitorApi: properties.visitorApi,
   debug: false,
   useMockData: false
 };
@@ -212,14 +212,14 @@ function getMockVisitorData(identifier: string | undefined) {
     visitor_id: `mock-visitor-${Date.now()}`,
     attributes: {
       email: visitorId,
-      phone: SAMPLE_DATA.phone,
-      name: SAMPLE_DATA.name
+      phone: properties.phone,
+      name: properties.name
     },
     audiences: ["New Visitor", "Website Visitor"],
     badges: ["First Visit"],
     properties: {
-      city: SAMPLE_DATA.city,
-      country: SAMPLE_DATA.country,
+      city: properties.city,
+      country: properties.country,
       interest: "AI Technology",
       last_visit: new Date().toISOString()
     },

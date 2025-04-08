@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { SAMPLE_DATA } from '@/lib/config';
+import { properties } from '@/lib/config';
 import { v4 as uuidv4 } from 'uuid';
 
 // Define interfaces for our lookupAttempt
@@ -38,7 +38,6 @@ interface DebugInfo {
     profile: string;
     engineId: string;
     datasourceKeyPresent: boolean;
-    apiKeyPresent: boolean;
   };
   apiKeyDetails?: {
     firstFiveChars?: string;
@@ -53,7 +52,7 @@ export async function POST(request: NextRequest) {
     // Get the request body
     const body = await request.json();
     const { 
-      email = SAMPLE_DATA.email || 'visitor@example.com',
+      email = properties.email,
       eventName = 'test_page_view',
       eventData = {},
       waitTimeMs = 5000, // Time to wait before attempting lookup
@@ -61,19 +60,11 @@ export async function POST(request: NextRequest) {
       retryDelayMs = 3000 // Delay between retries
     } = body;
 
-    // Get environment variables
-    const account = process.env.TEALIUM_ACCOUNT || '';
-    const profile = process.env.TEALIUM_PROFILE || '';
-    const datasourceKey = process.env.TEALIUM_DATASOURCE_KEY || '';
-    const apiKey = process.env.TEALIUM_MOMENTS_API_KEY || '';
-    const engineId = process.env.TEALIUM_ENGINE_ID || '';
-
-    if (!apiKey) {
-      return NextResponse.json(
-        { error: 'API key not configured. Set TEALIUM_MOMENTS_API_KEY in environment variables.' },
-        { status: 500 }
-      );
-    }
+    // Get account details from centralized properties
+    const account = properties.account;
+    const profile = properties.profile;
+    const datasourceKey = properties.dataSourceKey;
+    const engineId = properties.engineId;
 
     // Generate a visitor ID if not provided
     const visitorId = uuidv4();
@@ -95,13 +86,6 @@ export async function POST(request: NextRequest) {
       event_id: uuidv4()
     };
 
-    // API Key information (without revealing the full key)
-    const apiKeyDetails = apiKey ? {
-      firstFiveChars: apiKey.substring(0, 5),
-      lastFiveChars: apiKey.substring(apiKey.length - 5),
-      length: apiKey.length
-    } : undefined;
-
     // Debugging information to return to the caller
     const debugInfo: DebugInfo = {
       sendEventDetails: {
@@ -116,16 +100,15 @@ export async function POST(request: NextRequest) {
       lookupAttempts: [],
       finalLookupResult: null,
       success: false,
-      message: '',
-      recommendedAction: '',
+      message: 'Not started',
+      recommendedAction: 'None yet',
       tealiumConfig: {
         account,
         profile,
         engineId,
-        datasourceKeyPresent: !!datasourceKey,
-        apiKeyPresent: !!apiKey
+        datasourceKeyPresent: !!datasourceKey
       },
-      apiKeyDetails
+      apiKeyDetails: undefined
     };
 
     // Construct the URL for the Tealium EventStream API
@@ -213,7 +196,6 @@ export async function POST(request: NextRequest) {
           const lookupResponse = await fetch(approach.url, {
             method: 'GET',
             headers: {
-              'Authorization': `Bearer ${apiKey}`,
               'Accept': 'application/json',
               'Content-Type': 'application/json'
             }

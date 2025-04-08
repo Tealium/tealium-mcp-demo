@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { TEALIUM_ACCOUNT, TEALIUM_PROFILE, TEALIUM_ENGINE_ID, SAMPLE_DATA } from '@/lib/config';
+import { properties } from '@/lib/config';
 
 interface EndpointTest {
   name: string;
@@ -11,15 +11,14 @@ interface EndpointTest {
 
 export async function GET(request: NextRequest) {
   try {
-    // Get account configuration from centralized config
-    const account = TEALIUM_ACCOUNT;
-    const profile = TEALIUM_PROFILE;
-    const engineId = TEALIUM_ENGINE_ID;
-    const apiKey = process.env.TEALIUM_MOMENTS_API_KEY || '';
+    // Get account configuration from centralized properties
+    const account = properties.account;
+    const profile = properties.profile;
+    const engineId = properties.engineId;
     
     // Get email from query params or use default
     const { searchParams } = new URL(request.url);
-    const email = searchParams.get('email') || SAMPLE_DATA.email;
+    const email = searchParams.get('email') || properties.email;
     const visitorId = searchParams.get('visitorId') || 'tealium_visitor_id';
     
     // Test multiple API endpoints to determine which one works
@@ -62,7 +61,6 @@ export async function GET(request: NextRequest) {
         const response = await fetch(endpoint.url, {
           method: 'GET',
           headers: {
-            'Authorization': `Bearer ${apiKey}`,
             'Accept': 'application/json',
             'Content-Type': 'application/json'
           }
@@ -88,31 +86,48 @@ export async function GET(request: NextRequest) {
       }
     }
     
-    // Additional curl command for users to try
-    const curlCommands = {
-      exactAttributePattern: `curl -H "Authorization: Bearer YOUR_API_KEY" "https://personalization-api.eu-central-1.prod.tealiumapis.com/personalization/accounts/${account}/profiles/${profile}/engines/${engineId}/attributes/id:email/values/${encodeURIComponent(email)}"`,
-      exactVisitorPattern: `curl -H "Authorization: Bearer YOUR_API_KEY" "https://personalization-api.eu-central-1.prod.tealiumapis.com/personalization/accounts/${account}/profiles/${profile}/engines/${engineId}/visitors/${visitorId}"`
-    };
+    // Generate report of environment and configuration data
+    let accountIssue = "No issue detected";
+    let profileIssue = "No issue detected";
+    let engineIdIssue = "No issue detected";
     
-    // Determine API key issue
-    let apiKeyIssue = "No issue detected";
-    if (apiKey.length < 30) {
-      apiKeyIssue = "API key appears to be a placeholder or invalid (too short)";
-    } else if (apiKey.includes("YOUR_API_KEY") || apiKey.includes("your_tealium_api_key")) {
-      apiKeyIssue = "API key is still using placeholder value";
+    if (account.length < 1) {
+      accountIssue = "Account name appears to be missing";
+    } else if (account.includes("YOUR_ACCOUNT")) {
+      accountIssue = "Account is still using placeholder value";
     }
     
-    // Access and API info
+    if (profile.length < 1) {
+      profileIssue = "Profile name appears to be missing";
+    } else if (profile.includes("YOUR_PROFILE")) {
+      profileIssue = "Profile is still using placeholder value";
+    }
+    
+    if (engineId.length < 1) {
+      engineIdIssue = "Engine ID appears to be missing";
+    } else if (engineId.includes("YOUR_ENGINE_ID")) {
+      engineIdIssue = "Engine ID is still using placeholder value";
+    }
+    
+    // Additional curl command for users to try
+    const curlCommands = {
+      exactAttributePattern: `curl "https://personalization-api.eu-central-1.prod.tealiumapis.com/personalization/accounts/${account}/profiles/${profile}/engines/${engineId}/attributes/id:email/values/${encodeURIComponent(email)}"`,
+      exactVisitorPattern: `curl "https://personalization-api.eu-central-1.prod.tealiumapis.com/personalization/accounts/${account}/profiles/${profile}/engines/${engineId}/visitors/${visitorId}"`
+    };
+    
+    // Return all results
     return NextResponse.json({
-      testEmail: email,
-      tealiumConfig: {
-        account,
-        profile,
-        engineId,
-        apiKeyConfigured: apiKey.length > 0,
-        apiKeyLength: apiKey.length,
-        apiKeyMasked: apiKey ? `${apiKey.substring(0, 3)}...${apiKey.substring(apiKey.length - 3)}` : 'Not configured',
-        apiKeyIssue
+      success: true,
+      environmentData: {
+        accountConfigured: account.length > 0,
+        accountName: account,
+        profileConfigured: profile.length > 0,
+        profileName: profile,
+        engineIdConfigured: engineId.length > 0,
+        engineIdValue: engineId,
+        accountIssue,
+        profileIssue,
+        engineIdIssue
       },
       endpointTests: endpoints,
       apiDocumentation: {
@@ -121,9 +136,8 @@ export async function GET(request: NextRequest) {
       },
       curlCommands: curlCommands,
       recommendedActions: [
-        "1. Update your API key to a valid key from Tealium CDH → Admin → API Access",
-        "2. Ensure your API key has 'Visitor Profile API' permissions",
-        "3. Use the exact URL patterns from the screenshots for lookups"
+        "1. Ensure your account, profile, and engine ID are correctly configured",
+        "2. Use the exact URL patterns from the screenshots for lookups"
       ]
     }, { status: 200 });
   } catch (error) {

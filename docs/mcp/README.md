@@ -16,9 +16,9 @@ This document provides detailed information about the Tealium MCP implementation
 - **Moments API Base URL**: `https://personalization-api.eu-central-1.prod.tealiumapis.com/personalization/accounts/`
 
 ### Account Information
-- **Account**: `my-account`
-- **Profile**: `my-profile`
-- **Engine ID**: `my-engine-id`
+- **Account**: Configured in the properties object (`properties.account`)
+- **Profile**: Configured in the properties object (`properties.profile`)
+- **Engine ID**: Configured in the properties object (`properties.engineId`)
 
 ### Important Attribute IDs
 - **Email Attribute ID**: `5003` (Used for email-based lookups)
@@ -38,36 +38,35 @@ This document provides detailed information about the Tealium MCP implementation
 
 ### Visitor Lookup by Email
 ```
-GET ${MOMENTS_API_BASE_URL}${TEALIUM_ACCOUNT}/profiles/${TEALIUM_PROFILE}/engines/${ENGINE_ID}?attributeId=5003&attributeValue=${email}
+GET ${MOMENTS_API_BASE_URL}${properties.account}/profiles/${properties.profile}/engines/${properties.engineId}?attributeId=5003&attributeValue=${email}
 ```
 
 Example:
 ```
-GET https://personalization-api.eu-central-1.prod.tealiumapis.com/personalization/accounts/my-account/profiles/my-profile/engines/my-engine-id?attributeId=5003&attributeValue=example@email.com
+GET https://personalization-api.eu-central-1.prod.tealiumapis.com/personalization/accounts/[account]/profiles/[profile]/engines/[engineId]?attributeId=5003&attributeValue=example@email.com
 ```
 
 ### Visitor Lookup by Visitor ID
 ```
-GET ${MOMENTS_API_BASE_URL}${TEALIUM_ACCOUNT}/profiles/${TEALIUM_PROFILE}/engines/${ENGINE_ID}?visitorId=${visitorId}
+GET ${MOMENTS_API_BASE_URL}${properties.account}/profiles/${properties.profile}/engines/${properties.engineId}?visitorId=${visitorId}
 ```
 
 Example:
 ```
-GET https://personalization-api.eu-central-1.prod.tealiumapis.com/personalization/accounts/my-account/profiles/my-profile/engines/my-engine-id?visitorId=12345abcde
+GET https://personalization-api.eu-central-1.prod.tealiumapis.com/personalization/accounts/[account]/profiles/[profile]/engines/[engineId]?visitorId=12345abcde
 ```
 
 ## Authentication
 
-Authentication is performed using the `TEALIUM_MOMENTS_API_KEY` as a header:
+Authentication to the Moments API is performed via HTTP requests with appropriate headers:
 
 ```javascript
 const headers = {
-  'Authorization': `Bearer ${API_KEY}`,
   'Content-Type': 'application/json'
 };
 ```
 
-This API key should be kept secure and never exposed in client-side code.
+No API key is required for accessing this API.
 
 ## Data Structure
 
@@ -110,13 +109,7 @@ The API returns visitor data in the following structure:
 
 ```typescript
 import { NextRequest, NextResponse } from 'next/server';
-
-// Environment variables
-const API_KEY = process.env.TEALIUM_MOMENTS_API_KEY || '';
-const TEALIUM_ACCOUNT = process.env.TEALIUM_ACCOUNT || 'my-account';
-const TEALIUM_PROFILE = process.env.TEALIUM_PROFILE || 'my-profile';
-const ENGINE_ID = process.env.TEALIUM_ENGINE_ID || 'my-engine-id';
-const MOMENTS_API_BASE_URL = 'https://personalization-api.eu-central-1.prod.tealiumapis.com/personalization/accounts/';
+import { properties } from '@/lib/config';
 
 export async function GET(request: NextRequest) {
   // Get email from query params
@@ -130,12 +123,17 @@ export async function GET(request: NextRequest) {
     }, { status: 400 });
   }
   
-  // Construct the endpoint
-  const endpoint = `${MOMENTS_API_BASE_URL}${TEALIUM_ACCOUNT}/profiles/${TEALIUM_PROFILE}/engines/${ENGINE_ID}?attributeId=5003&attributeValue=${encodeURIComponent(email)}`;
+  // Get account configuration from centralized properties
+  const account = properties.account;
+  const profile = properties.profile;
+  const engineId = properties.engineId;
+  const momentsApiBaseUrl = 'https://personalization-api.eu-central-1.prod.tealiumapis.com/personalization/accounts/';
   
-  // Set up headers with auth
+  // Construct the endpoint
+  const endpoint = `${momentsApiBaseUrl}${account}/profiles/${profile}/engines/${engineId}?attributeId=5003&attributeValue=${encodeURIComponent(email)}`;
+  
+  // Set up headers
   const headers = {
-    'Authorization': `Bearer ${API_KEY}`,
     'Content-Type': 'application/json'
   };
   
@@ -237,7 +235,6 @@ const ProfileComponent = ({ email }: { email: string }) => {
 };
 
 export default ProfileComponent;
-```
 
 ## Troubleshooting
 
@@ -246,13 +243,10 @@ export default ProfileComponent;
 1. **"Either visitorId or both attributeId and attributeValue must be provided"**
    - Solution: Ensure you're providing either a valid visitorId OR both attributeId and attributeValue in the API request.
 
-2. **401 Unauthorized**
-   - Solution: Check that your API key is valid and included in the Authorization header.
-
-3. **404 Not Found**
+2. **404 Not Found**
    - Solution: Verify the account, profile, and engine ID are correct.
 
-4. **No visitor data returned**
+3. **No visitor data returned**
    - Solution: Confirm the email or visitor ID exists in the Tealium database.
 
 ### Debugging Tips

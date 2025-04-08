@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { TEALIUM_ACCOUNT, TEALIUM_PROFILE, TEALIUM_ENGINE_ID, SAMPLE_DATA } from '@/lib/config';
+import { properties } from '@/lib/config';
 
 /**
  * Advanced diagnostics endpoint for Tealium Moments API
@@ -7,14 +7,14 @@ import { TEALIUM_ACCOUNT, TEALIUM_PROFILE, TEALIUM_ENGINE_ID, SAMPLE_DATA } from
  */
 export async function GET(request: NextRequest) {
   try {
-    // Get account configuration from centralized config
-    const account = TEALIUM_ACCOUNT;
-    const profile = TEALIUM_PROFILE;
-    const engineId = TEALIUM_ENGINE_ID;
+    // Get account configuration from centralized properties
+    const account = properties.account;
+    const profile = properties.profile;
+    const engineId = properties.engineId;
     
     // Get query parameters
     const searchParams = request.nextUrl.searchParams;
-    const email = searchParams.get('email') || SAMPLE_DATA.email;
+    const email = searchParams.get('email') || properties.email;
     const region = searchParams.get('region') || 'eu-central-1';
     const testMultipleRegions = searchParams.get('testRegions') === 'true';
     
@@ -23,7 +23,6 @@ export async function GET(request: NextRequest) {
         account,
         profile,
         engineId,
-        apiKeyPresent: !!process.env.TEALIUM_MOMENTS_API_KEY,
         email,
       },
       regionTests: {},
@@ -52,11 +51,6 @@ export async function GET(request: NextRequest) {
     ];
     
     // Basic validation checks
-    if (!process.env.TEALIUM_MOMENTS_API_KEY) {
-      results.possibleIssues.push("Missing API key - TEALIUM_MOMENTS_API_KEY environment variable not set");
-      results.recommendedFixes.push("Add your Tealium API key to the .env.local file as TEALIUM_MOMENTS_API_KEY");
-    }
-    
     if (email.length < 6) {
       results.possibleIssues.push("Email too short for Visitor ID attribute - must be 6-255 characters");
     }
@@ -82,7 +76,6 @@ export async function GET(request: NextRequest) {
           const response = await fetch(url, {
             method: 'GET',
             headers: {
-              'Authorization': `Bearer ${process.env.TEALIUM_MOMENTS_API_KEY}`,
               'Accept': 'application/json',
               'Content-Type': 'application/json'
             }

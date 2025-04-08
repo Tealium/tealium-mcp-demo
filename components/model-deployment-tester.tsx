@@ -192,7 +192,6 @@ export default function ModelDeploymentTester() {
   // Email input and visitor data fetching
   const [emailInput, setEmailInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [momentsApiKey, setMomentsApiKey] = useState('');
   const [visitorData, setVisitorData] = useState(null);
   
   // Fetch visitor data based on email
@@ -217,11 +216,6 @@ export default function ModelDeploymentTester() {
       // Add engine ID for Moments API
       if (engineId) {
         url += `&engineId=${encodeURIComponent(engineId)}`;
-      }
-      
-      // Add API key if available
-      if (momentsApiKey) {
-        url += `&apiKey=${encodeURIComponent(momentsApiKey)}`;
       }
 
       console.log('Fetching visitor data with full configuration');
@@ -334,20 +328,6 @@ export default function ModelDeploymentTester() {
               />
               <p className="text-xs text-gray-500 mt-1">Required for Moments API integration</p>
             </div>
-            
-            {tealiumIntegration === 'moments' && (
-              <div>
-                <Label htmlFor="moments-api-key">Moments API Key</Label>
-                <Input
-                  id="moments-api-key"
-                  value={momentsApiKey}
-                  onChange={(e) => setMomentsApiKey(e.target.value)}
-                  placeholder="your_moments_api_key"
-                  type="password"
-                />
-                <p className="text-xs text-gray-500 mt-1">Required for authenticated Moments API requests</p>
-              </div>
-            )}
             
             <div>
               <Label htmlFor="visitor-id">Visitor ID</Label>

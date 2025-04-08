@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Logger from '../../../../../lib/debug-logger';
+import { properties } from '@/lib/config';
 
 export async function GET(request: NextRequest) {
   try {
@@ -9,7 +10,6 @@ export async function GET(request: NextRequest) {
     const requestEngineId = searchParams.get('engineId');
     const requestAccount = searchParams.get('account');
     const requestProfile = searchParams.get('profile');
-    const requestApiKey = searchParams.get('apiKey');
     
     if (!email) {
       return NextResponse.json({ 
@@ -23,24 +23,21 @@ export async function GET(request: NextRequest) {
       requestEngineId,
       requestAccount,
       requestProfile,
-      requestApiKey: requestApiKey ? '[REDACTED]' : undefined,
       requestUrl: request.url
     });
     
-    // Tealium account configuration - prioritize request params over env vars
-    const account = requestAccount || process.env.TEALIUM_ACCOUNT || '';
-    const profile = requestProfile || process.env.TEALIUM_PROFILE || '';
+    // Tealium account configuration - prioritize request params over config constants
+    const account = requestAccount || properties.account;
+    const profile = requestProfile || properties.profile;
     
     // Remove any leading slashes from the engineId to prevent double slashes in the URL
-    const engineId = (requestEngineId || process.env.TEALIUM_ENGINE_ID || '').replace(/^\/+/, '');
-    const apiKey = requestApiKey || process.env.TEALIUM_MOMENTS_API_KEY;
+    const engineId = (requestEngineId || properties.engineId || '').replace(/^\/+/, '');
     
     Logger.debug('Using Tealium configuration', { 
       account, 
       profile, 
       engineId,
-      engineIdSource: requestEngineId ? 'request' : 'environment',
-      apiKeySource: requestApiKey ? 'request' : 'environment'
+      engineIdSource: requestEngineId ? 'request' : 'config'
     });
 
     // Ensure required parameters are present
@@ -59,21 +56,12 @@ export async function GET(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // Removed the API key requirement check
-    // Instead we'll attempt the request with alternative URL patterns
-
     // Set up headers for the Tealium API
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
     
-    // Add API key if available (essential for authentication)
-    if (apiKey) {
-      headers['Authorization'] = `Bearer ${apiKey}`;
-      Logger.debug('Added Authorization header with API key');
-    } else {
-      Logger.warning('No API key provided for Tealium API - authentication will likely fail');
-    }
+    // Note: Moments API currently doesn't require an API key
 
     // Add referrer headers which may help with no-auth access
     headers['Referer'] = 'https://tealium-mcp-ingestion-app.vercel.app';

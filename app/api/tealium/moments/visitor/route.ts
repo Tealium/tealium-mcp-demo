@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { TEALIUM_ACCOUNT, TEALIUM_PROFILE, TEALIUM_VISITOR_API, SAMPLE_DATA } from '@/lib/config';
+import { properties } from '@/lib/config';
 
 /**
  * Tealium Moments API Visitor Endpoint
@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     const email = searchParams.get('email');
     
     console.log(`[Moments Visitor] Fetching visitor data for email: ${email}`);
-    console.log(`[Moments Visitor] Using account: ${TEALIUM_ACCOUNT}, profile: ${TEALIUM_PROFILE}`);
+    console.log(`[Moments Visitor] Using account: ${properties.account}, profile: ${properties.profile}`);
     
     // Validate email
     if (!email) {
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Construct the Moments API endpoint for visitor lookup
-    const momentsEndpoint = `${TEALIUM_VISITOR_API}/${TEALIUM_ACCOUNT}/${TEALIUM_PROFILE}/visitors/${encodeURIComponent(email)}`;
+    const momentsEndpoint = `${properties.visitorApi}/${properties.account}/${properties.profile}/visitors/${encodeURIComponent(email)}`;
     console.log(`[Moments Visitor] Calling Moments API at: ${momentsEndpoint}`);
     
     // Make the API request
@@ -94,8 +94,8 @@ export async function POST(request: NextRequest) {
     // Extract request body parameters
     const body = await request.json();
     const { 
-      account = TEALIUM_ACCOUNT, 
-      profile = TEALIUM_PROFILE, 
+      account = properties.account, 
+      profile = properties.profile, 
       engine_id,  
       visitor_id, 
       attribute_id, 
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
     } = body;
     
     // For backwards compatibility, also try camelCase if snake_case is undefined
-    const engineId = engine_id || body.engineId || '';
+    const engineId = engine_id || body.engineId || properties.engineId;
     
     console.log(`[Moments Visitor] POST request received`);
     
