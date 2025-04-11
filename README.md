@@ -176,10 +176,6 @@ To extend this application:
 - **Enhanced Personalization**: Implement more sophisticated personalization logic
 - **User Authentication**: Add proper authentication for secure access to user data
 
-## License
-
-[Your license information here]
-
 ## Acknowledgements
 
 - Tealium for their customer data platform
