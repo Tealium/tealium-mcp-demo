@@ -96,8 +96,8 @@ The application follows a 7-step workflow for Tealium-integrated chatbots:
 
 1. Clone the repository
    ```
-   git clone https://github.com/evardvq/Tealium_MCP_Ingestion_app.git
-   cd Tealium_MCP_Ingestion_app
+   git clone https://github.com/Tealium/tealium-mcp-demo.git
+   cd tealium-mcp-demo
    ```
 
 2. Install dependencies
@@ -175,10 +175,6 @@ To extend this application:
 - **Additional Context Sources**: Integrate with other data sources beyond Tealium
 - **Enhanced Personalization**: Implement more sophisticated personalization logic
 - **User Authentication**: Add proper authentication for secure access to user data
-
-## License
-
-[Your license information here]
 
 ## Acknowledgements
 
