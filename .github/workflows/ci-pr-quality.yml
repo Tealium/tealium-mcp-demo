@@ -1,0 +1,10 @@
+---
+name: ci-pr-quality
+
+on:
+  pull_request:
+    types: [opened, reopened, edited, synchronize]
+
+jobs:
+  ci-pr-quality:
+    uses: Tealium/github-actions-shared/.github/workflows/ci-pr-quality.yml@main
